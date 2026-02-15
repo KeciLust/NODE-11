@@ -1,5 +1,7 @@
 const express = require("express");
 const path = require("path");
+const mongoose = require("mongoose");
+
 
 // middleware
 const logger = require("./middleware/logger");
@@ -41,7 +43,20 @@ app.use("/api", postBookRouter);
 app.use("/api", getBookDownLoadRouter);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Сервер запущен на http://localhost:${PORT}`);
-  console.log(`Интерфейс доступен на http://localhost:${PORT}/api/books`);
-});
+const MONGO_URI = process.env.ME_CONFIG_MONGODB_URL || "mongodb://root:example@mongo:27017/";
+
+async function start(PORT, MONGO_URI) {
+
+  try{
+
+    await mongoose.connect(MONGO_URI);
+    app.listen(PORT, () => {
+      console.log(`Сервер запущен на http://localhost:${PORT}`);
+      console.log(`Интерфейс доступен на http://localhost/api/books`);
+    });
+  }catch (error) {
+    console.error("Ошибка при подключении к MongoDB:", error);
+    process.exit(1);
+  }
+}
+start(PORT, MONGO_URI);
