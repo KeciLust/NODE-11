@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактировать <%= book.title %> | Библиотека</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #08090c 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .back-link {
+            display: inline-block;
+            color: #667eea;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: normal;
+        }
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        .btn:hover {
+            opacity: 0.85;
+        }
+        .btn-primary {
+            background: #ffc107;
+            color: #333;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .required {
+            color: #dc3545;
+        }
+        .hint {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 5px;
+        }
+        .current-file {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/api/books/<%= book.id %>" class="back-link">← Назад к книге</a>
+        
+        <h1>✏️ Редактировать книгу</h1>
+
+        <form action="/api/books/update/<%= book.id %>" method="POST">
+            <div class="form-group">
+                <label for="title">Название <span class="required">*</span></label>
+                <input type="text" id="title" name="title" value="<%= book.title || '' %>" required placeholder="Введите название книги">
+            </div>
+
+            <div class="form-group">
+                <label for="authors">Автор(ы)</label>
+                <input type="text" id="authors" name="authors" value="<%= book.authors || '' %>" placeholder="Например: Иван Иванов, Петр Петров">
+            </div>
+
+            <div class="form-group">
+                <label for="description">Описание</label>
+                <textarea id="description" name="description" placeholder="Краткое описание книги"><%= book.description || '' %></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="fileName">Имя файла</label>
+                <input type="text" id="fileName" name="fileName" value="<%= book.fileName || '' %>" placeholder="Оригинальное имя файла">
+            </div>
+
+            <div class="form-group">
+                <label for="fileCover">Обложка (URL)</label>
+                <input type="text" id="fileCover" name="fileCover" value="<%= book.fileCover || '' %>" placeholder="Ссылка на изображение обложки">
+                <% if (book.fileCover) { %>
+                    <div class="current-file">Текущая обложка: <%= book.fileCover %></div>
+                <% } %>
+            </div>
+
+            <% if (book.fileBook) { %>
+                <div class="form-group">
+                    <label>Файл книги</label>
+                    <div class="current-file">Текущий файл: <%= book.fileBook %></div>
+                    <div class="hint">Изменение файла книги доступно только при создании</div>
+                </div>
+            <% } %>
+
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="favorite" name="favorite" value="true" 
+                        <%= (book.favorite === 'true' || book.favorite === true) ? 'checked' : '' %>>
+                    <label for="favorite">⭐ Добавить в избранное</label>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                <a href="/api/books/<%= book.id %>" class="btn btn-secondary">Отмена</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

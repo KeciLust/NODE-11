@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= book.title %> | Библиотека</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #08090c 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .back-link {
+            display: inline-block;
+            color: #667eea;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .authors {
+            color: #666;
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+        .favorite-badge {
+            display: inline-block;
+            background: #ffc107;
+            color: #333;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .book-details {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        .detail-row {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #555;
+        }
+        .detail-value {
+            color: #333;
+            word-wrap: break-word;
+        }
+        .description {
+            line-height: 1.6;
+        }
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .btn {
+            flex: 1;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            transition: opacity 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        .btn:hover {
+            opacity: 0.85;
+        }
+        .btn-edit {
+            background: #ffc107;
+            color: #333;
+        }
+        .btn-download {
+            background: #28a745;
+            color: white;
+        }
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+        .file-link {
+            color: #667eea;
+            text-decoration: none;
+        }
+        .file-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/api/books" class="back-link">← Назад к списку</a>
+        
+        <h1><%= book.title || 'Без названия' %></h1>
+        
+        <div class="authors"><%= book.authors || 'Автор не указан' %></div>
+        
+        <% if (book.favorite === 'true' || book.favorite === true) { %>
+            <span class="favorite-badge">⭐ Избранное</span>
+        <% } %>
+
+        <div class="book-details">
+            <div class="detail-row">
+                <div class="detail-label">👁️ Просмотров:</div>
+                <div class="detail-value" style="font-weight: 600; color: #667eea;"><%= viewCount || 0 %></div>
+            </div>
+
+            <% if (book.description) { %>
+                <div class="detail-row">
+                    <div class="detail-label">Описание:</div>
+                    <div class="detail-value description"><%= book.description %></div>
+                </div>
+            <% } %>
+            
+            <div class="detail-row">
+                <div class="detail-label">ID книги:</div>
+                <div class="detail-value"><%= book.id %></div>
+            </div>
+
+            <% if (book.fileName) { %>
+                <div class="detail-row">
+                    <div class="detail-label">Название файла:</div>
+                    <div class="detail-value"><%= book.fileName %></div>
+                </div>
+            <% } %>
+
+            <% if (book.fileCover) { %>
+                <div class="detail-row">
+                    <div class="detail-label">Обложка:</div>
+                    <div class="detail-value">
+                        <a href="/<%= book.fileCover %>" class="file-link" target="_blank">Открыть обложку</a>
+                    </div>
+                </div>
+            <% } %>
+
+            <% if (book.fileBook) { %>
+                <div class="detail-row">
+                    <div class="detail-label">Файл книги:</div>
+                    <div class="detail-value">
+                        <a href="/<%= book.fileBook %>" class="file-link" target="_blank">Просмотреть файл</a>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+
+        <div class="actions">
+            <a href="/api/books/update/<%= book.id %>" class="btn btn-edit">Редактировать</a>
+            <% if (book.fileBook) { %>
+                <a href="/api/books/<%= book.id %>/download" class="btn btn-download">Скачать книгу</a>
+            <% } %>
+            <form action="/api/books/delete/<%= book.id %>" method="POST" style="flex: 1;" onsubmit="return confirm('Вы уверены, что хотите удалить эту книгу?')">
+                <button type="submit" class="btn btn-delete" style="width: 100%;">Удалить</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Библиотека книг</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #08090c 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5em;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            transition: background 0.3s;
+            font-weight: 600;
+        }
+        .btn:hover {
+            background: #5568d3;
+        }
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        .book-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .book-title {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .book-authors {
+            color: #666;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+        .book-description {
+            color: #777;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            line-height: 1.5;
+            max-height: 3em;
+            overflow: hidden;
+        }
+        .book-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .book-actions a {
+            flex: 1;
+            text-align: center;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+        .btn-view {
+            background: #667eea;
+            color: white;
+        }
+        .btn-edit {
+            background: #ffc107;
+            color: #333;
+        }
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+        .book-actions a:hover {
+            opacity: 0.85;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        .empty-state h2 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+        .favorite-badge {
+            display: inline-block;
+            background: #ffc107;
+            color: #333;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Библиотека книг</h1>
+        
+        <a href="/api/books/create" class="btn">+ Добавить книгу</a>
+
+        <% if (books.length === 0) { %>
+            <div class="empty-state">
+                <h2>Библиотека пуста</h2>
+                <p>Добавьте первую книгу, чтобы начать</p>
+            </div>
+        <% } else { %>
+            <div class="books-grid">
+                <% books.forEach(book => { %>
+                    <div class="book-card">
+                        <% if (book.favorite === 'true' || book.favorite === true) { %>
+                            <span class="favorite-badge">⭐ Избранное</span>
+                        <% } %>
+                        <div class="book-title"><%= book.title || 'Без названия' %></div>
+                        <div class="book-authors"><%= book.authors || 'Автор не указан' %></div>
+                        <% if (book.description) { %>
+                            <div class="book-description"><%= book.description %></div>
+                        <% } %>
+                        <div class="book-actions">
+                            <a href="/api/books/<%= book.id %>" class="btn-view">Просмотр</a>
+                            <a href="/api/books/update/<%= book.id %>" class="btn-edit">Изменить</a>
+                            <a href="/api/books/delete/<%= book.id %>" class="btn-delete" onclick="return confirm('Удалить книгу?')">Удалить</a>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } %>
+    </div>
+</body>
+</html>

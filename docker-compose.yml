@@ -1,0 +1,30 @@
+services:
+
+  books-app:
+    image: kecilusty/netology:v1.0.0
+    container_name: books-app
+    ports:
+      - 80:3002
+    environment:
+      - PORT=3002
+      - COUNTER_SERVICE_URL=http://counter-book:3001
+    volumes:
+      - ./:/app
+      - ./server.log:/app/server.log
+    depends_on:
+      - counter-book
+  counter-book:
+    image: kecilusty/counter-book
+    container_name: counter-book
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - REDIS_HOST=redis://storage
+    depends_on:
+      - storage   
+  storage:
+    image: redis:latest
+    container_name: storage
+    volumes:
+      - ./data:/data
