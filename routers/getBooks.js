@@ -1,23 +1,19 @@
 const express = require("express");
 const router = express.Router();
-const stor = require("../public/books/storage");
+const Book = require("../models/books");
 
 
-router.get("/books", (req, res) => {
-  const { book } = stor;
-  
-
-  if (req.accepts("html")) {
-    res.render("index", { books: book });
-  } else {
-
-    res.json(book);
+router.get("/books", async (req, res) => {
+  try {
+    const books = await Book.find().select("-__v");
+    res.render("index", {
+      books
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: "Ошибка при получении книг"
+    });
   }
-});
-
-
-router.get("/books/create", (req, res) => {
-  res.render("create");
 });
 
 module.exports = router;

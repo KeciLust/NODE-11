@@ -36,11 +36,11 @@ app.get("/", (req, res) => {
 
 app.use("/api", loginRouter);
 app.use("/api", getBooksRouter);
-app.use("/api", deleteBookRouter);
-app.use("/api", putBookRouter);
-app.use("/api", getBookRouter);
 app.use("/api", postBookRouter);
+app.use("/api", putBookRouter);
+app.use("/api", deleteBookRouter);
 app.use("/api", getBookDownLoadRouter);
+app.use("/api", getBookRouter);
 
 const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.ME_CONFIG_MONGODB_URL || "mongodb://root:example@mongo:27017/";
@@ -52,7 +52,7 @@ async function start(PORT, MONGO_URI) {
     await mongoose.connect(MONGO_URI);
     app.listen(PORT, () => {
       console.log(`Сервер запущен на http://localhost:${PORT}`);
-      console.log(`Интерфейс доступен на http://localhost/api/books`);
+      console.log(`Интерфейс доступен на http://localhost`);
     });
   }catch (error) {
     console.error("Ошибка при подключении к MongoDB:", error);

@@ -1,51 +1,46 @@
 const express = require("express");
 const router = express.Router();
-const stor = require("../public/books/storage");
+const Book = require("../models/books");
 
-// PUT для API
-router.put("/books/:id", (req, res) => {
-  const { id } = req.params;
-  const { book } = stor;
-  const bookIndex = book.findIndex((el) => el.id === id);
-  if (bookIndex !== -1) {
+router.put("/books/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
     const { title, description, authors, favorite, fileName, fileCover } = req.body;
-    book[bookIndex] = {
-      ...book[bookIndex],
-      title,
-      description,
-      authors,
-      favorite,
-      fileName,
-      fileCover,
-    };
-    res.json(book[bookIndex]);
-  } else {
-    res.status(404).json({ message: "Книга не найдена" });
+    
+    const book = await Book.findOneAndUpdate(
+      { id },
+      { title, description, authors, favorite, fileName, fileCover },
+      { new: true }
+    ).select("-__v");
+    
+    if (book) {
+      res.json(book);
+    } else {
+      res.status(404).json({ message: "Книга не найдена" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Ошибка при обновлении книги" });
   }
 });
 
-// POST для HTML формы 
-router.post("/books/update/:id", (req, res) => {
-  const { id } = req.params;
-  const { book } = stor;
-  const bookIndex = book.findIndex((el) => el.id === id);
-  
-  if (bookIndex !== -1) {
+router.post("/books/update/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
     const { title, description, authors, favorite, fileName, fileCover } = req.body;
-    book[bookIndex] = {
-      ...book[bookIndex],
-      title,
-      description,
-      authors,
-      favorite: favorite || false,
-      fileName,
-      fileCover,
-    };
     
-    // Редирект на страницу просмотра книги
-    res.redirect(`/api/books/${id}`);
-  } else {
-    res.status(404).send("Книга не найдена");
+    const book = await Book.findOneAndUpdate(
+      { id },
+      { title, description, authors, favorite: favorite || false, fileName, fileCover },
+      { new: true }
+    );
+    
+    if (book) {
+      res.redirect(`/api/books/${id}`);
+    } else {
+      res.status(404).send("Книга не найдена");
+    }
+  } catch (error) {
+    res.status(500).send("Ошибка при обновлении книги");
   }
 });
 

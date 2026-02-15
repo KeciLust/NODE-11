@@ -1,45 +1,52 @@
 const express = require("express");
 const router = express.Router();
-const stor = require("../public/books/storage");
+const Book = require("../models/books");
 
 
-router.delete("/books/:id", (req, res) => {
-  const { id } = req.params;
-  const { book } = stor;
-  const bookIndex = book.findIndex((el) => el.id === id);
-  if (bookIndex !== -1) {
-    book.splice(bookIndex, 1);
-    res.json("OK");
-  } else {
-    res.status(404).json({ message: "Книга не найдена" });
+router.delete("/books/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const book = await Book.findOneAndDelete({ id });
+    
+    if (book) {
+      res.json("OK");
+    } else {
+      res.status(404).json({ message: "Книга не найдена" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Ошибка при удалении книги" });
   }
 });
 
 
-router.get("/books/delete/:id", (req, res) => {
-  const { id } = req.params;
-  const { book } = stor;
-  const bookIndex = book.findIndex((el) => el.id === id);
-  
-  if (bookIndex !== -1) {
-    book.splice(bookIndex, 1);
-    res.redirect("/api/books");
-  } else {
-    res.status(404).send("Книга не найдена");
+router.get("/books/delete/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const book = await Book.findOneAndDelete({ id });
+    
+    if (book) {
+      res.redirect("/api/books");
+    } else {
+      res.status(404).send("Книга не найдена");
+    }
+  } catch (error) {
+    res.status(500).send("Ошибка при удалении книги");
   }
 });
 
 
-router.post("/books/delete/:id", (req, res) => {
-  const { id } = req.params;
-  const { book } = stor;
-  const bookIndex = book.findIndex((el) => el.id === id);
-  
-  if (bookIndex !== -1) {
-    book.splice(bookIndex, 1);
-    res.redirect("/api/books");
-  } else {
-    res.status(404).send("Книга не найдена");
+router.post("/books/delete/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const book = await Book.findOneAndDelete({ id });
+    
+    if (book) {
+      res.redirect("/api/books");
+    } else {
+      res.status(404).send("Книга не найдена");
+    }
+  } catch (error) {
+    res.status(500).send("Ошибка при удалении книги");
   }
 });
 

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const stor = require("../public/books/storage");
+const Book = require("../models/books");
 
 // URL сервиса счетчиков (из переменной окружения или localhost)
 const COUNTER_SERVICE_URL = process.env.COUNTER_SERVICE_URL || "http://localhost:3001";
@@ -33,10 +33,9 @@ async function getCounter(bookId) {
   return { bookId, counter: 0 };
 }
 
-router.get("/books/update/:id", (req, res) => {
+router.get("/books/update/:id", async (req, res) => {
   const { id } = req.params;
-  const { book } = stor;
-  const foundBook = book.find((el) => el.id === id);
+  const foundBook = await Book.findOne({ id }).select("-__v");
 
   if (foundBook) {
     res.render("update", { book: foundBook });
@@ -48,10 +47,9 @@ router.get("/books/update/:id", (req, res) => {
 
 router.get("/books/:id", async (req, res) => {
   const { id } = req.params;
-  const { book } = stor;
-  const bookById = book.findIndex((el) => el.id === id);
+  const bookById = await Book.findOne({ id }).select("-__v");
   
-  if (bookById !== -1) {
+  if (bookById) {
     // Увеличиваем счетчик просмотров
     await incrementCounter(id);
     
@@ -60,12 +58,12 @@ router.get("/books/:id", async (req, res) => {
     
     if (req.accepts("html")) {
       res.render("view", { 
-        book: book[bookById],
+        book: bookById,
         viewCount: counterData.counter
       });
     } else {
       res.json({
-        ...book[bookById],
+        ...bookById.toObject(),
         viewCount: counterData.counter
       });
     }
